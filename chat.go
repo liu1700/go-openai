@@ -71,7 +71,7 @@ type FunctionCall struct {
 
 // ChatCompletionRequest represents a request structure for chat completion API.
 type ChatCompletionRequest struct {
-	Model            string                  `json:"model"`
+	Model            string                  `json:"model,omitempty"`
 	Models           []string                `json:"models,omitempty"`
 	Route            string                  `json:"route,omitempty"`
 	Messages         []ChatCompletionMessage `json:"messages"`
