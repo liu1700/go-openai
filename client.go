@@ -187,6 +187,10 @@ func (c *Client) setCommonHeaders(req *http.Request) {
 	} else if c.config.authToken != "" {
 		// OpenAI or Azure AD authentication
 		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.config.authToken))
+		if c.config.APIType == APITypeOpenRouter {
+			req.Header.Set("HTTP-Referer", c.config.OpenRouterConfig.HTTPReferer)
+			req.Header.Set("X-Title", c.config.OpenRouterConfig.AppName)
+		}
 	}
 	if c.config.OrgID != "" {
 		req.Header.Set("OpenAI-Organization", c.config.OrgID)
