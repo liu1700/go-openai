@@ -20,11 +20,16 @@ const (
 	APITypeAzure           APIType = "AZURE"
 	APITypeAzureAD         APIType = "AZURE_AD"
 	APITypeCloudflareAzure APIType = "CLOUDFLARE_AZURE"
+	APITypeOpenRouter      APIType = "OPEN_ROUTER"
 )
 
 const AzureAPIKeyHeader = "api-key"
 
 const defaultAssistantVersion = "v1" // This will be deprecated by the end of 2024.
+type OpenRouterConfig struct {
+	HTTPReferer string // required for Open Router API to identify the client
+	AppName     string // name of application
+}
 
 // ClientConfig is a configuration of a client.
 type ClientConfig struct {
@@ -36,6 +41,7 @@ type ClientConfig struct {
 	APIVersion           string // required when APIType is APITypeAzure or APITypeAzureAD
 	AssistantVersion     string
 	AzureModelMapperFunc func(model string) string // replace model to azure deployment name func
+	OpenRouterConfig     *OpenRouterConfig         // required when APIType is APITypeOpenRouter
 	HTTPClient           *http.Client
 
 	EmptyMessagesLimit uint
@@ -65,6 +71,20 @@ func DefaultAzureConfig(apiKey, baseURL string) ClientConfig {
 		AzureModelMapperFunc: func(model string) string {
 			return regexp.MustCompile(`[.:]`).ReplaceAllString(model, "")
 		},
+
+		HTTPClient: &http.Client{},
+
+		EmptyMessagesLimit: defaultEmptyMessagesLimit,
+	}
+}
+
+func DefaultOpenRouterConfig(authToken, baseURL string, openRouterConfig *OpenRouterConfig) ClientConfig {
+	return ClientConfig{
+		authToken:        authToken,
+		BaseURL:          baseURL,
+		APIType:          APITypeOpenRouter,
+		OrgID:            "",
+		OpenRouterConfig: openRouterConfig,
 
 		HTTPClient: &http.Client{},
 
